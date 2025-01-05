@@ -4,11 +4,12 @@ const unit = 30;
 const canvasWidth = 950;
 const canvasHeight = 550;
 let ballArray = [];
-let xSpeed = 20;
-let ySpeed = 20;
+let xSpeed = 10;
+let ySpeed = 10;
 let circle_x = 160;
 let circle_y = 60;
 let radius = 20;
+let count = 0;
 
 const row = canvas.height / unit; // 320 / 20 = 16
 const column = canvas.width / unit; // 320 / 20 = 16
@@ -43,6 +44,17 @@ class Ball {
     ctx.fillStyle = "red";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
+  //觸碰目標物
+  hitTarget(ballx, bally) {
+    if (
+      ballx >= this.x - radius &&
+      bally <= this.y + this.height + radius &&
+      ballx <= this.x + this.width + radius &&
+      bally >= this.y - radius
+    ) {
+      return true;
+    }
+  }
 }
 
 for (let i = 0; i < 10; i++) {
@@ -62,29 +74,54 @@ function draw() {
   //畫面塗黑
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  //球體動起來
+  //打中目標的處理
+  ballArray.forEach((ball) => {
+    if (ball.visible && ball.hitTarget(circle_x, circle_y)) {
+      count++;
+      console.log(count);
+      ball.visible = false;
+    }
 
+    //打到目標轉向
+
+    if (count == 10) {
+      alert("finished!");
+      return;
+    }
+  });
+
+  //球體動起來
   circle_x += xSpeed;
   circle_y += ySpeed;
 
   //球撞牆回彈
   if (circle_x >= canvasWidth - radius) {
     xSpeed *= -1;
-  } else if (circle_y >= canvasHeight - radius) {
+  }
+  if (circle_y >= canvasHeight - radius) {
     ySpeed *= -1;
-  } else if (circle_x < 0) {
+  }
+  if (circle_x <= radius) {
     xSpeed *= -1;
-  } else if (circle_y < 0) {
+  }
+  if (circle_y <= radius) {
     ySpeed *= -1;
   }
 
+  //如果球打中目標 目標塗黑
+
   //劃出棒子 跟著滑鼠的X座標走
   ctx.fillStyle = "yellow";
-  ctx.fillRect(mouseX - 50, 500, 100, 20);
-
+  ctx.fillRect(mouseX - 100, 500, 200, 5);
+  //撞到棒子回彈
+  if (circle_x < mouseX + 100 && circle_x > mouseX - 100 && circle_y == 500) {
+    ySpeed *= -1;
+  }
   //畫出目標球體
   ballArray.forEach((ball) => {
-    ball.drawBall();
+    if (ball.visible) {
+      ball.drawBall();
+    }
   });
 
   // 畫出圓球
