@@ -83,6 +83,7 @@ function draw() {
     }
 
     //打到目標轉向
+    //從左往右
 
     if (count == 10) {
       alert("finished!");
